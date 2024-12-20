@@ -43,7 +43,7 @@ const TopNavbar = () => {
           </button>
         </Link>
         {/* Login Button*/}
-        <Link href="/">
+        <Link href="/pages/auth/login">
           <button className="px-4 py-2 border-none rounded-lg hover:bg-white hover:text-[#264743]">
             Login
           </button>
