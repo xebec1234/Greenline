@@ -9,12 +9,6 @@ const HomePage = ({ children }: { children: React.ReactNode }) => {
     <div className="bg-[#efece1] min-h-screen">
       <TopNavbar />
       <SideNavbar isLoggedIn={isLoggedIn} />
-      <main>
-        <h1 className="text-black text-3xl font-bold text-center col">Welcome to Greenline!</h1>
-        <p className="text-black text-center mt-2">
-          A place for coders to share knowledge and grow together.
-        </p>
-      </main>
     </div>
   );
 };
