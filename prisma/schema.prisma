@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id              Int      @id @default(autoincrement())
+  username        String?  @unique
+  email           String   @unique
+  password        String
+  reputation      String?
+  Join_date       DateTime @default(now())
+  profile_pic_url String?
+
+  posts         Posts[]        @relation("UserPosts")
+  comments      Comments[]     @relation("UserComments")
+  votes         Votes[]        @relation("UserVotes")
+  notifications Notification[]
+}
+
+model AnonymousUsers {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  join_date    DateTime @default(now())
+  temp_user_id String   @default(uuid())
+
+  posts    Posts[]    @relation("AnonUserPosts")
+  comments Comments[] @relation("AnonUserComments")
+}
+
+model Posts {
+  post_Id       String   @id @default(cuid())
+  user_Id       Int?
+  anon_user_Id  Int?
+  title         String
+  body          String
+  post_type     String
+  parent_id     String?
+  creation_date DateTime @default(now())
+  score         Int?
+
+  user          Users?          @relation("UserPosts", fields: [user_Id], references: [id])
+  anon_user     AnonymousUsers? @relation("AnonUserPosts", fields: [anon_user_Id], references: [id])
+  comments      Comments[]      @relation("PostComments")
+  tags          Post_Tags[]
+  notifications Notification[]
+  votes         Votes[]
+}
+
+model Comments {
+  comment_Id   String   @id @default(cuid())
+  post_Id      String
+  user_Id      Int?
+  anon_user_Id Int?
+  content      String
+  comment_Date DateTime @default(now())
+  score        Int?
+
+  post          Posts           @relation("PostComments", fields: [post_Id], references: [post_Id])
+  user          Users?          @relation("UserComments", fields: [user_Id], references: [id])
+  anon_user     AnonymousUsers? @relation("AnonUserComments", fields: [anon_user_Id], references: [id])
+  notifications Notification[]
+}
+
+model Post_Tags {
+  post_Id String @id @default(cuid())
+  tag_id  Int
+
+  post Posts @relation(fields: [post_Id], references: [post_Id])
+  tag  Tags  @relation(fields: [tag_id], references: [id])
+}
+
+model Tags {
+  id          Int    @id @default(autoincrement())
+  tag_name    String
+  description String
+
+  post_tags Post_Tags[]
+}
+
+model Notification {
+  notification_id Int      @id @default(autoincrement())
+  post_Id         String
+  comment_Id      String
+  user_Id         Int
+  type            String
+  content         String
+  is_read         Boolean  @default(false)
+  created_at      DateTime @default(now())
+
+  post    Posts?    @relation(fields: [post_Id], references: [post_Id])
+  comment Comments? @relation(fields: [comment_Id], references: [comment_Id])
+  user    Users     @relation(fields: [user_Id], references: [id])
+}
+
+model Votes {
+  vote_id   Int      @id @default(autoincrement())
+  user_Id   Int
+  post_Id   String
+  vote_type String
+  vote_date DateTime @default(now())
+
+  user Users @relation("UserVotes", fields: [user_Id], references: [id])
+  post Posts @relation(fields: [post_Id], references: [post_Id])
+}
