@@ -22,10 +22,11 @@ model Users {
   Join_date       DateTime @default(now())
   profile_pic_url String?
 
-  posts         Posts[]        @relation("UserPosts")
-  comments      Comments[]     @relation("UserComments")
-  votes         Votes[]        @relation("UserVotes")
+  posts         Posts[]         @relation("UserPosts")
+  comments      Comments[]      @relation("UserComments")
+  votes         Votes[]         @relation("UserVotes")
   notifications Notification[]
+  Comment_Votes Comment_Votes[] @relation("UserVotes")
 }
 
 model AnonymousUsers {
@@ -55,6 +56,7 @@ model Posts {
   tags          Post_Tags[]
   notifications Notification[]
   votes         Votes[]
+  Comment_Votes Comment_Votes[]
 }
 
 model Comments {
@@ -70,10 +72,12 @@ model Comments {
   user          Users?          @relation("UserComments", fields: [user_Id], references: [id])
   anon_user     AnonymousUsers? @relation("AnonUserComments", fields: [anon_user_Id], references: [id])
   notifications Notification[]
+  Comment_Votes Comment_Votes[]
 }
 
 model Post_Tags {
-  post_Id String @id @default(cuid())
+  id      Int    @id @default(autoincrement())
+  post_Id String
   tag_id  Int
 
   post Posts @relation(fields: [post_Id], references: [post_Id])
@@ -81,9 +85,8 @@ model Post_Tags {
 }
 
 model Tags {
-  id          Int    @id @default(autoincrement())
-  tag_name    String
-  description String
+  id       Int    @id @default(autoincrement())
+  tag_name String
 
   post_tags Post_Tags[]
 }
@@ -112,4 +115,17 @@ model Votes {
 
   user Users @relation("UserVotes", fields: [user_Id], references: [id])
   post Posts @relation(fields: [post_Id], references: [post_Id])
+}
+
+model Comment_Votes {
+  vote_id    Int      @id @default(autoincrement())
+  user_Id    Int
+  post_Id    String
+  comment_Id String
+  vote_type  String
+  vote_date  DateTime @default(now())
+
+  comment Comments @relation(fields: [comment_Id], references: [comment_Id])
+  user    Users    @relation("UserVotes", fields: [user_Id], references: [id])
+  post    Posts    @relation(fields: [post_Id], references: [post_Id])
 }

@@ -16,11 +16,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "../Editor";
+import TagSelector from "../TagSelector";
 
 // Validation Schema
 const PostSchema = z.object({
   title: z.string(),
   body: z.string().min(1, { message: "Body is required" }),
+  tags: z.array(z.string()),
   postType: z.enum(["open", "closed"]),
 });
 
@@ -42,13 +44,35 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
     defaultValues: {
       title: "",
       body: "",
+      tags: [],
       postType: "open",
     },
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [databaseTags, setDatabaseTags] = useState<string[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    // Fetch tags from the backend
+    const fetchTags = async () => {
+      try {
+        const response = await fetch("/api/post/tags");
+        if (response.ok) {
+          const tags = await response.json();
+          // Map the tags to an array of strings
+          const tagNames = tags.map(
+            (tag: { tag_name: string }) => tag.tag_name
+          );
+          setDatabaseTags(tagNames);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tags", error);
+      }
+    };
+    fetchTags();
+  }, []);
 
   // Track the hydration state
   const [isHydrated, setIsHydrated] = useState(false);
@@ -73,7 +97,7 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
         },
         body: JSON.stringify({
           ...data,
-          userId: session.user.id, // Attach the userId from the session
+          userId: session.user.id,
         }),
       });
 
@@ -115,6 +139,22 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Tag Selector Field */}
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <TagSelector
+                      existingTags={databaseTags}
+                      onTagSelected={(tags) => field.onChange(tags)}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

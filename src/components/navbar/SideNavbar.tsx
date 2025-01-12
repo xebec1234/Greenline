@@ -24,11 +24,14 @@ const SideNavbar = async () => {
 
   return (
     <aside
-      className="bg-[#efece1] h-screen w-64 border-r border-[#264743] sticky top-16 float-left flex flex-col py-10 pl-24"
+      className="bg-[#efece1] h-screen w-64 border-r border-[#264743] sticky top-16 float-left flex flex-col py-10 pl-24 self-start"
+      style={{
+        height: "calc(100vh - 64px)", // Keeps sidebar sticky minus navbar height
+      }}
       aria-label="Sidebar"
     >
       {/* Navigation Items */}
-      <nav className="space-y-4">
+      <nav className="space-y-4 py-10">
         <Link href="/">
           <button className="flex items-center space-x-2 text-base font-semibold text-[#264743] hover:underline">
             <HomeIcon className="w-5 h-5" />
@@ -41,7 +44,7 @@ const SideNavbar = async () => {
             <span>Questions</span>
           </button>
         </Link>
-        <Link href="/">
+        <Link href="/pages/search/filterTags">
           <button className="flex items-center space-x-2 text-base font-semibold text-[#264743] hover:underline">
             <FunnelIcon className="w-5 h-5" />
             <span>Filter (tags)</span>
@@ -80,7 +83,9 @@ const SideNavbar = async () => {
             <LogoutAccountSideNav />
           </div>
         ) : (
-          <p className="text-gray-500 mt-8">Log in</p>
+          <Link href="/pages/auth/login">
+            <p className="text-gray-500 mt-8">Log in</p>
+          </Link>
         )}
       </nav>
     </aside>

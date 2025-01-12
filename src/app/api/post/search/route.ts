@@ -30,6 +30,17 @@ export async function GET(req: Request) {
         score: true,
         user_Id: true,
         anon_user_Id: true,
+        creation_date: true,
+        comments: true,
+        tags: {
+          select: {
+            tag: {
+              select: {
+                tag_name: true,
+              },
+            },
+          },
+        },
       },
     });
 

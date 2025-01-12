@@ -9,23 +9,20 @@ const PostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   body: z.string().min(1, "Body is required"),
   postType: z.enum(["open", "closed"]),
+  tags: z.array(z.string()).optional(), // Add tags to the schema
   userId: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   try {
-    // Get the session of the logged-in user
     const session = await getServerSession(authOption);
 
-    // Parse the incoming request body
     const requestBody = await req.json();
     const parsedData = PostSchema.parse(requestBody);
 
-    // Check if the session exists (if user is authenticated)
     const userId = session ? session.user.id : null;
 
-    // If there's no userId and no session, handle anonymous posting (if applicable)
-    const anonUserId = !userId ? await createAnonymousUser() : null;
+    const anonUser_Id = !userId ? await createAnonymousUser() : null;
 
     // Create the post
     const post = await db.posts.create({
@@ -33,19 +30,54 @@ export async function POST(req: Request) {
         title: parsedData.title,
         body: parsedData.body,
         post_type: parsedData.postType,
-        user_Id: userId ? parseInt(userId) : null, // Use null instead of undefined
-        anon_user_Id: anonUserId ? parseInt(anonUserId) : null,
-        score: 0, // Use null instead of undefined
+        user_Id: userId ? parseInt(userId) : null,
+        anon_user_Id: anonUser_Id ? parseInt(anonUser_Id) : null,
+        score: 0,
       },
     });
+
+    // Associate tags with the post if any tags are provided
+    if (parsedData.tags && parsedData.tags.length > 0) {
+      const tagIds = await Promise.all(
+        parsedData.tags.map(async (tagName) => {
+          // Find the tag by name using findFirst
+          const tag = await db.tags.findFirst({
+            where: { tag_name: tagName },
+          });
+          return tag ? tag.id : null; // Return the tag ID or null if not found
+        })
+      );
+
+      // Filter out null values (tags that were not found)
+      const validTagIds = tagIds.filter((id) => id !== null);
+
+      // Create entries in the Post_Tags table
+      await Promise.all(
+        validTagIds.map((tagId) => {
+          return db.post_Tags.create({
+            data: {
+              post_Id: post.post_Id,
+              tag_id: tagId as number, // Cast to number since we filtered nulls
+            },
+          });
+        })
+      );
+    }
 
     // Return the newly created post
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
-    console.error(error);
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json({ message: errorMessage }, { status: 500 });
+    // Check if the error is an instance of Error
+    if (error instanceof Error) {
+      console.error("Error creating post:", error.message);
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    } else {
+      console.error("Unknown error occurred:", error);
+      return NextResponse.json(
+        { message: "An unknown error occurred" },
+        { status: 500 }
+      );
+    }
   }
 }
 

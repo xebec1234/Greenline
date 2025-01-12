@@ -25,6 +25,12 @@ export const getUnreadNotificationsCount = async (): Promise<number> => {
     return unreadCount;
   } catch (error) {
     console.error("Error fetching unread notifications:", error);
+    // Check if error is an instance of Error
+    if (error instanceof Error) {
+      console.error("Error fetching unread notifications:", error.message);
+    } else {
+      console.error("Unexpected error fetching unread notifications:", error);
+    }
     return 0;
   }
 };

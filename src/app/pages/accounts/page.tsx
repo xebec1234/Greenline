@@ -5,6 +5,7 @@ import AccountManagement from "@/components/accountManagement/AccountManagement"
 import { db } from "@/lib/db";
 import { authOption } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import Footer from "@/components/navbar/Footer";
 
 interface AccountPageParams {
   params: Promise<{
@@ -54,6 +55,7 @@ async function page({ params }: AccountPageParams) {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

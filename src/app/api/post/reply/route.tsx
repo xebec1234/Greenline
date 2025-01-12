@@ -19,6 +19,7 @@ export async function POST(req: Request) {
         post_Id: parsedData.post_Id,
         user_Id: parseInt(parsedData.user_Id),
         comment_Date: new Date(),
+        score: 0,
       },
     });
 

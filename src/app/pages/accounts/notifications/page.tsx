@@ -5,6 +5,7 @@ import TopNavbar from "@/components/navbar/TopNavbar";
 import SideNavbar from "@/components/navbar/SideNavbar";
 import Notification from "@/components/Notification";
 import { redirect } from "next/navigation";
+import Footer from "@/components/navbar/Footer";
 
 interface NotificationType {
   notification_id: number;
@@ -54,6 +55,7 @@ async function page() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

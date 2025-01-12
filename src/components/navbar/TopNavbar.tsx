@@ -7,23 +7,27 @@ import { getServerSession } from "next-auth";
 import UserAccountNav from "../button/UserAccountNav";
 import SearchBar from "../searchEngine/SearchBar";
 
-const TopNavbar = async () => {
+async function TopNavbar() {
   const session = await getServerSession(authOption);
   return (
     <nav className="bg-[#264743] text-white py-2 px-6 sticky top-0 z-50 flex items-center justify-between">
       <div className="flex items-center px-16">
-        <Image
-          src="/greenline-logo.png"
-          alt="Greenline Logo"
-          width={50}
-          height={50}
-          priority
-          className="rounded-full"
-          style={{ width: "auto", height: "auto" }}
-        />
-        <span className="text-xl font-bold">Greenline</span>
+        <Link href="/">
+          <div className="flex items-center">
+            <Image
+              src="/greenline-logo.png"
+              alt="Greenline Logo"
+              width={50}
+              height={50}
+              priority
+              className="rounded-full"
+              style={{ width: "auto", height: "auto" }}
+            />
+            <span className="text-xl font-bold">Greenline</span>
+          </div>
+        </Link>
         {/* About Button */}
-        <Link href="">
+        <Link href="/pages/about">
           <button className="mx-10 text-sm hover:underline">About</button>
         </Link>
       </div>
@@ -58,6 +62,6 @@ const TopNavbar = async () => {
       </div>
     </nav>
   );
-};
+}
 
 export default TopNavbar;

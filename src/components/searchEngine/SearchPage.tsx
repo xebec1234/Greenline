@@ -52,28 +52,22 @@ const SearchPage = () => {
                   {post.title}
                 </h2>
               </Link>
-              <div className="mt-2 text-sm text-gray-700">
-                {post?.body ? (
-                  post.body.includes("<div") ? (
-                    <pre className="language-javascript max-w-3xl mx-auto">
-                      <code dangerouslySetInnerHTML={{ __html: post.body }} />
-                    </pre>
-                  ) : (
-                    <p>
-                      {post.body.length > 200
-                        ? `${post.body.slice(0, 200)}...`
-                        : post.body}
-                    </p>
-                  )
-                ) : (
-                  <p>No content available.</p>
-                )}
-              </div>
               <div className="mt-4 flex justify-between text-xs text-gray-500">
                 <span>
                   Posted on: {new Date(post.creation_date).toLocaleDateString()}
                 </span>
-                <span>Score: {post.score}</span>
+                <span>Answers: {post.comments.length}</span>
+              </div>
+              {/* Display Tags */}
+              <div className="mt-2 flex flex-wrap gap-2">
+                {post.tags.map((postTag: any) => (
+                  <span
+                    key={postTag.tag.tag_name}
+                    className="bg-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"
+                  >
+                    {postTag.tag.tag_name}
+                  </span>
+                ))}
               </div>
             </div>
           ))}

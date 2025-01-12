@@ -1,15 +1,16 @@
-import { authOption } from '@/lib/auth'
-import { getServerSession } from 'next-auth'
-import React from 'react'
+import React from "react";
+import HeroIntro from "./Hero/HeroIntro";
+import JoinCommunity from "./Hero/JoinCommunity";
+import Invitation from "./Hero/Invitation";
 
 const Hero = async () => {
-    const session = await getServerSession(authOption);
-    if(session?.user) {
-        return <div className="bg-[#efece1]">successfully Login</div>;
-    } 
-    return (
-        <div className="bg-[#efece1]">please Login</div>
-    )
-}
+  return (
+    <div className="bg-[#efece1] pr-28 pl-64">
+      <HeroIntro />
+      <JoinCommunity />
+      <Invitation />
+    </div>
+  );
+};
 
-export default Hero
+export default Hero;
