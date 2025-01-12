@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
-import { Toggle } from "./ui/toggle"; // Assuming ShadCN UI has a Toggle component
-import { CodeBracketIcon, PlusIcon } from "@heroicons/react/24/outline"; // Assuming you're using Heroicons
+import { Toggle } from "./ui/toggle";
+import { CodeBracketIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 interface EditorProps {
   onChange: (content: string) => void;

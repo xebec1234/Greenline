@@ -66,7 +66,7 @@ async function userPage() {
         <div className="flex-1 mx-4 mt-4 space-y-6">
           <h1 className="text-2xl font-bold text-gray-900">Your Questions</h1>
           {posts.length > 0 ? (
-            posts.map((post) => (
+            posts.map((post: any) => (
               <div
                 key={post.post_Id}
                 className="p-6 border border-gray-300 rounded-md shadow-sm  bg-white hover:shadow-md"
@@ -95,7 +95,7 @@ async function userPage() {
                 </div>
                 {/* Display Tags */}
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {post.tags.map((postTag) => (
+                  {post.tags.map((postTag: any) => (
                     <span
                       key={postTag.tag.tag_name}
                       className="bg-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"

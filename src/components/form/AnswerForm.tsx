@@ -83,6 +83,7 @@ const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
 
       form.reset();
       router.refresh();
+      window.location.reload();
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "An unexpected error occurred."

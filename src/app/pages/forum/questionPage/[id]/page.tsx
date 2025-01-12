@@ -95,7 +95,7 @@ async function questionPage({ params }: QuestionPageParams) {
                   </div>
                   {/* Display Tags */}
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {post?.tags.map((postTag) => (
+                    {post?.tags.map((postTag: any) => (
                       <span
                         key={postTag.tag.tag_name}
                         className="bg-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"
