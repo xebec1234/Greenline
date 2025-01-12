@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { FaFacebook, FaGithub } from "react-icons/fa";
 
 function Footer() {
   return (
@@ -22,11 +23,17 @@ function Footer() {
 
           {/* Center Links */}
           <div className="flex space-x-6 mb-4 md:mb-0">
-            <Link href="/about">
+            <Link href="/pages/about">
               <p className="text-sm hover:underline cursor-pointer">About</p>
             </Link>
-            <Link href="/contact">
-              <p className="text-sm hover:underline cursor-pointer">Contact</p>
+            {/* Facebook Icon */}
+            <Link href="https://facebook.com" passHref>
+              <FaFacebook size={24} />
+            </Link>
+
+            {/* GitHub Icon */}
+            <Link href="https://github.com" passHref>
+              <FaGithub size={24} />
             </Link>
           </div>
 

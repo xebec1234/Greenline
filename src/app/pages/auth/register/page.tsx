@@ -15,7 +15,7 @@ export default async function Register() {
         <TopNavbar />
         <main className="flex flex-1 items-center justify-center my-10">
           {/* Left Section */}
-          <div className="flex flex-1 flex-col items-center md:items-end text-[#264743] p-5">
+          <div className="flex flex-1 flex-col items-center text-[#264743] p-5">
             <div className="w-32 h-32 md:w-80 md:h-80">
               <Image
                 src="/greenline-logo.png"
@@ -25,14 +25,14 @@ export default async function Register() {
                 className="rounded-full bg-[#264743] shadow-lg floating-logo object-contain"
               />
             </div>
-            <h2 className="text-4xl font-bold mt-4 md:mt-8">Greenline</h2>
+            <h2 className="text-4xl font-bold">Greenline</h2>
           </div>
 
           {/* Divider Line in the Middle */}
           <div className="w-[1px] bg-gray-300 h-3/4"></div>
 
           {/* Right Section - Form Container */}
-          <div className="flex flex-1 justify-center p-5 ml-32">
+          <div className="flex flex-1 justify-center p-5">
             <h3>You're already signed in!</h3>
           </div>
         </main>
@@ -45,7 +45,7 @@ export default async function Register() {
       <TopNavbar />
       <main className="flex flex-1 items-center justify-center my-10">
         {/* Left Section */}
-        <div className="flex flex-1 flex-col items-center md:items-end text-[#264743] p-5">
+        <div className="flex flex-1 flex-col items-center text-[#264743] p-5">
           <div className="w-32 h-32 md:w-80 md:h-80">
             <Image
               src="/greenline-logo.png"
@@ -55,14 +55,14 @@ export default async function Register() {
               className="rounded-full bg-[#264743] shadow-lg floating-logo object-contain"
             />
           </div>
-          <h2 className="text-4xl font-bold mt-4 md:mt-8">Greenline</h2>
+          <h2 className="text-4xl font-bold">Greenline</h2>
         </div>
 
         {/* Divider Line in the Middle */}
         <div className="w-[1px] bg-gray-300 h-3/4"></div>
 
         {/* Right Section - Form Container */}
-        <div className="flex flex-1 justify-center p-5 ml-32">
+        <div className="flex flex-1 justify-center p-5">
           <SignUpForm />
         </div>
       </main>
