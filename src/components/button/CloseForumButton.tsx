@@ -1,38 +1,60 @@
 "use client";
 
+import { useState } from "react";
+import AlertMessage from "../ui/Alert";
+import { Button } from "../ui/button";
+
 type CloseForumButtonProps = {
   postId: string;
 };
 
 export default function CloseForumButton({ postId }: CloseForumButtonProps) {
+  const [alert, setAlert] = useState<{ message: string; visible: boolean }>({
+    message: "",
+    visible: false,
+  });
+
+  const showAlert = (message: string) => {
+    setAlert({ message, visible: true });
+  };
+
+  const closeAlert = () => {
+    window.location.reload();
+    setAlert({ message: "", visible: false });
+  };
+
   const handleCloseForum = async () => {
     try {
       const response = await fetch("/api/post/closedForum", {
         method: "POST",
-        headers: { 
-            "Content-Type": "application/json" 
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ postId }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to close forum");
+        showAlert("Failed to close forum");
       }
 
-      alert("Forum has been closed.");
-      window.location.reload(); // Reload page to reflect changes
+      showAlert("Forum has been closed.");
     } catch (error) {
       console.error(postId);
-      alert("Failed to close the forum.");
+      showAlert("Failed to close the forum.");
     }
   };
 
   return (
-    <button
-      onClick={handleCloseForum}
-      className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-3 rounded"
-    >
-      Close Forum
-    </button>
+    <div>
+      <Button
+        onClick={handleCloseForum}
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-3 rounded"
+      >
+        Close Forum
+      </Button>
+      {alert.visible && (
+        <AlertMessage message={alert.message} onClose={closeAlert} />
+      )}
+    </div>
   );
 }

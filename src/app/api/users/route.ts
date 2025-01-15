@@ -37,7 +37,6 @@ export async function POST(req: Request) {
     });
 
     const { password: newUserPassword, ...rest } = newUser;
-
     return NextResponse.json(
       { users: newUserPassword, message: "Successfully registered!" },
       { status: 201 }

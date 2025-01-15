@@ -16,9 +16,9 @@ function FilterTagsPage() {
           <SideNavbar />
 
           {/* Main Content */}
-          <div className="flex-1 mx-4 mt-4 space-y-6">
+          <div className="flex-1 mx-4 my-4 space-y-6">
             <TagSelectorForm />
-            <FilterPage /> {/* Render the FilterPage component */}
+            <FilterPage />
           </div>
           <div className="w-64 ml-4 mt-4 p-4 bg-[#efece1] rounded-md shadow-md">
             <PopularQuestionsSidebar />

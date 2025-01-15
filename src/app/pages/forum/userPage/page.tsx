@@ -63,7 +63,7 @@ async function userPage() {
         <SideNavbar />
 
         {/* Main Content */}
-        <div className="flex-1 mx-4 mt-4 space-y-6">
+        <div className="flex-1 mx-4 my-4 space-y-6">
           <h1 className="text-2xl font-bold text-gray-900">Your Questions</h1>
           {posts.length > 0 ? (
             posts.map((post: any) => (

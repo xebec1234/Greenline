@@ -8,25 +8,27 @@ import {
   FormControl,
   FormMessage,
 } from "../ui/form";
+import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Editor from "../Editor";
 import AlertMessage from "../ui/Alert";
 
-const CommentSchema = z.object({
+const ReplySchema = z.object({
   content: z.string().min(1, { message: "Comment body is required" }),
-  post_Id: z.string(),
+  comment_id: z.string(),
   user_Id: z.string(),
+  post_id: z.string(),
 });
 
-type CommentFormValues = z.infer<typeof CommentSchema>;
+type ReplyFormValues = z.infer<typeof ReplySchema>;
 
-interface CommentFormProps {
-  post_Id: string;
+interface ReplyFormProps {
+  comment_id: string;
+  post_id: string;
   session: {
     user?: {
       id: string;
@@ -34,12 +36,17 @@ interface CommentFormProps {
   } | null;
 }
 
-const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
-  const form = useForm<CommentFormValues>({
-    resolver: zodResolver(CommentSchema),
+const ReplyForm: React.FC<ReplyFormProps> = ({
+  comment_id,
+  session,
+  post_id,
+}) => {
+  const form = useForm<ReplyFormValues>({
+    resolver: zodResolver(ReplySchema),
     defaultValues: {
       content: "",
-      post_Id,
+      comment_id,
+      post_id,
       user_Id: session?.user?.id || "",
     },
   });
@@ -64,11 +71,11 @@ const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
     return (
       <div className="mt-4">
         <p className="text-gray-600">
-          You must be logged in to answer this question.
+          You must be logged in to reply to this comment.
         </p>
         <Button
           onClick={() => router.push("/pages/auth/login")}
-          className="bg-blue-500 text-white"
+          className="bg-[#264743] text-white"
         >
           Log In
         </Button>
@@ -76,12 +83,12 @@ const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
     );
   }
 
-  const onSubmit = async (data: CommentFormValues) => {
+  const onSubmit = async (data: ReplyFormValues) => {
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/post/reply", {
+      const response = await fetch("/api/post/reply/replies", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,8 +100,9 @@ const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
         const errorData = await response.json();
         showAlert(errorData.message || "Failed to submit comment.");
       }
+
       const Successfully = await response.json();
-      showAlert(Successfully.message || "Answered Posted");
+      showAlert(Successfully.message || "Reply Posted!");
       form.reset();
       router.refresh();
       window.location.reload();
@@ -108,45 +116,39 @@ const AnswerForm: React.FC<CommentFormProps> = ({ post_Id, session }) => {
   };
 
   return (
-    <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-lg font-bold mb-2">Give an answer</h2>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Answer</FormLabel>
-                <FormControl>
-                  <Editor
-                    onChange={(content: string) => {
-                      field.onChange(content); // Update the form field with the editor content
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="bg-blue-500 text-white"
-            disabled={isLoading}
-          >
-            {isLoading ? "Submitting..." : "Submit Answer"}
-          </Button>
-          {errorMessage && (
-            <p className="text-red-500 text-sm">{errorMessage}</p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  className=" focus:ring-0 focus:border-[#264743] placeholder-gray-500"
+                  placeholder="Type your answer here..."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </form>
-      </Form>
+        />
+
+        <Button
+          type="submit"
+          className="bg-[#264743] text-white"
+          disabled={isLoading}
+        >
+          {isLoading ? "Submitting..." : "Submit reply"}
+        </Button>
+        {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+      </form>
       {alert.visible && (
         <AlertMessage message={alert.message} onClose={closeAlert} />
       )}
-    </div>
+    </Form>
   );
 };
 
-export default AnswerForm;
+export default ReplyForm;

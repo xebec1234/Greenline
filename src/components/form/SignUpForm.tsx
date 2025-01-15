@@ -1,28 +1,56 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import GoogleSignInButton from '../button/GoogleSignInButton'; 
-import { useRouter } from 'next/navigation';
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import GoogleSignInButton from "../button/GoogleSignInButton";
+import { useRouter } from "next/navigation";
+import AlertMessage from "../ui/Alert";
+import { useState } from "react";
+import Link from "next/link";
 
 // Validation schema
 const FormSchema = z
   .object({
     email: z.string().email({ message: "Please enter a valid email address." }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-    confirmPassword: z.string().min(6, {message: "You need to re-enter your password."}),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters." }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "You need to re-enter your password." }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Password does not match'
-  })
+    path: ["confirmPassword"],
+    message: "Password does not match",
+  });
 
 const SignUpForm = () => {
   const router = useRouter();
+  const [alert, setAlert] = useState<{ message: string; visible: boolean }>({
+    message: "",
+    visible: false,
+  });
+
+  const showAlert = (message: string) => {
+    setAlert({ message, visible: true });
+  };
+
+  const closeAlert = () => {
+    router.push("/pages/auth/login");
+    setAlert({ message: "", visible: false });
+  };
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,22 +60,22 @@ const SignUpForm = () => {
     },
   });
 
-  const onSubmit =  async (data: z.infer<typeof FormSchema>) => {
-    const response = await fetch('/api/users', {
-      method: 'POST',
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const response = await fetch("/api/users", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email: data.email,
-        password: data.password
-      })
-    })
+        password: data.password,
+      }),
+    });
 
-    if(response.ok){
-      router.push('/pages/auth/login');
-    } else{
-      console.error('Registration failed');
+    if (response.ok) {
+      showAlert("Successfully Registered!");
+    } else {
+      showAlert("Registration failed");
     }
   };
 
@@ -57,7 +85,6 @@ const SignUpForm = () => {
         <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
             {/* Email Field */}
             <FormField
               control={form.control}
@@ -126,15 +153,28 @@ const SignUpForm = () => {
             >
               Sign Up
             </Button>
-            <div className='mx-auto my-4 flex w-full items-center justify-evenly 
+            <div
+              className="mx-auto my-4 flex w-full items-center justify-evenly 
             before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 
-            after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400'>
+            after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400"
+            >
               or
             </div>
-            <GoogleSignInButton>Sign up with Google</GoogleSignInButton>
+            <p className="text-center text-sm text-gray-600 mt-2">
+              if you have already an account. please&nbsp;
+              <Link
+                className="text-green-900 hover:underline"
+                href="/pages/auth/login"
+              >
+                Sign in
+              </Link>
+            </p>
           </form>
         </Form>
       </div>
+      {alert.visible && (
+        <AlertMessage message={alert.message} onClose={closeAlert} />
+      )}
     </div>
   );
 };

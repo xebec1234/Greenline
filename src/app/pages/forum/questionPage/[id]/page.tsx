@@ -12,6 +12,7 @@ import he from "he";
 import { Suspense } from "react";
 import PopularQuestionsSidebar from "@/components/navbar/rightSideBar/PopularQuestions";
 import Footer from "@/components/navbar/Footer";
+import { Content } from "next/font/google";
 
 interface QuestionPageParams {
   params: Promise<{
@@ -42,6 +43,14 @@ async function questionPage({ params }: QuestionPageParams) {
           anon_user_Id: true,
           comment_Date: true,
           score: true,
+          replies: {
+            select: {
+              reply_id: true,
+              content: true,
+              user_id: true,
+              reply_date: true,
+            },
+          },
         },
       },
       user: {
@@ -59,6 +68,41 @@ async function questionPage({ params }: QuestionPageParams) {
           },
         },
       },
+    },
+  });
+
+  const commentUserIds = post?.comments
+    .map((comment) => comment.user_Id)
+    .filter((userId) => userId !== null);
+
+  const commentUsers = await db.users.findMany({
+    where: {
+      id: {
+        in: commentUserIds,
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  });
+
+  const replyUserIds = post?.comments
+    .flatMap((comment) => comment.replies.map((reply) => reply.user_id))
+    .filter((userId) => userId !== null);
+
+  // Fetch user information for all the user_ids in replyUserIds
+  const users = await db.users.findMany({
+    where: {
+      id: {
+        in: replyUserIds, // This will fetch all users where user_Id is in the replyUserIds array
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
     },
   });
 
@@ -120,16 +164,18 @@ async function questionPage({ params }: QuestionPageParams) {
                   />
                 </div>
               </div>
-
               <hr className="my-4 border-gray-300" />
             </div>
             <CommentsSection
               comments={post?.comments ?? []}
               postId={post?.post_Id ?? ""}
+              commentUsers={commentUsers}
               Users={{
                 username: post?.user?.username ?? "",
                 email: post?.user?.email ?? "",
               }}
+              session={session}
+              userReply={users}
             />
             {post?.post_type === "closed" ? (
               <div className="mt-4 text-lg font-semibold text-gray-600">

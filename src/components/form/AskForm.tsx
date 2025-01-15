@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Editor from "../Editor";
 import TagSelector from "../TagSelector";
+import AlertMessage from "../ui/Alert";
 
 // Validation Schema
 const PostSchema = z.object({
@@ -53,6 +54,18 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [databaseTags, setDatabaseTags] = useState<string[]>([]);
   const router = useRouter();
+  const [alert, setAlert] = useState<{ message: string; visible: boolean }>({
+    message: "",
+    visible: false,
+  });
+
+  const showAlert = (message: string) => {
+    setAlert({ message, visible: true });
+  };
+
+  const closeAlert = () => {
+    setAlert({ message: "", visible: false });
+  };
 
   useEffect(() => {
     // Fetch tags from the backend
@@ -103,10 +116,11 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "An unexpected error occurred.");
+        showAlert(errorData.message || "An unexpected error occurred.");
       }
 
       const post = await response.json();
+      showAlert("Successfully Posted!");
       router.push(`/pages/forum/questionPage/${post.post_Id}`);
     } catch (error) {
       if (error instanceof Error) {
@@ -189,6 +203,9 @@ const AskForm: React.FC<AskFormProps> = ({ session }) => {
             </form>
           </Form>
         </div>
+        {alert.visible && (
+          <AlertMessage message={alert.message} onClose={closeAlert} />
+        )}
       </main>
     </div>
   );

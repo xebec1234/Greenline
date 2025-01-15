@@ -7,14 +7,24 @@ export async function DELETE(request: Request) {
     const { postId } = body;
 
     if (!postId) {
-      console.error("Post ID not provided.");
-      return NextResponse.json({ message: "Post ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Post ID is required" },
+        { status: 400 }
+      );
     }
 
     // Check if the post exists
     const post = await db.posts.findUnique({
       where: { post_Id: postId },
-      include: { comments: true }, // Including comments to check if there are any
+      include: {
+        comments: {
+          include: {
+            replies: true,
+            notifications: true,
+          },
+        },
+        notifications: true,
+      },
     });
 
     if (!post) {
@@ -22,23 +32,57 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
     }
 
-    // If the post has comments, delete them first
-    if (post.comments && post.comments.length > 0) {
-      await db.comments.deleteMany({
-        where: { post_Id: postId },
+    await db.post_Tags.deleteMany({
+      where: { post_Id: postId },
+    });
+
+    // Delete votes linked to the post
+    await db.votes.deleteMany({
+      where: { post_Id: postId },
+    });
+
+    // Delete notifications linked to the post
+    await db.notification.deleteMany({
+      where: { post_Id: postId },
+    });
+
+    // Iterate over each comment
+    for (const comment of post.comments) {
+      await db.comment_Votes.deleteMany({
+        where: { comment_Id: comment.comment_Id },
       });
-      console.log(`Deleted ${post.comments.length} comments associated with post ID ${postId}`);
+
+      await db.notification.deleteMany({
+        where: { comment_Id: comment.comment_Id },
+      });
+
+      // Delete replies linked to the comment
+      await db.reply.deleteMany({
+        where: { comment_id: comment.comment_Id },
+      });
+
+      // Delete the comment itself
+      await db.comments.delete({
+        where: { comment_Id: comment.comment_Id },
+      });
     }
 
-    // Now delete the post itself
+    // Finally, delete the post itself
     await db.posts.delete({
       where: { post_Id: postId },
     });
 
-    console.log(`Post with ID ${postId} and its comments deleted successfully.`);
-    return NextResponse.json({ message: "Post and associated comments deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Post and associated comments deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Error during post deletion:", error);
-    return NextResponse.json({ message: "Internal server error", error: error }, { status: 500 });
+    // Check if error is an object or a string
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error during post deletion:", errorMessage);
+    return NextResponse.json(
+      { message: "Internal server error", error: error },
+      { status: 500 }
+    );
   }
 }

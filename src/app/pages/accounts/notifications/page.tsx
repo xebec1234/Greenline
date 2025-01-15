@@ -46,7 +46,7 @@ async function page() {
       <TopNavbar />
       <div className="flex">
         <SideNavbar />
-        <div className="flex-1 mx-4 mt-4 space-y-6">
+        <div className="flex-1 mx-4 mt-4 space-y-6 mb-5">
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
           {notifications.length > 0 ? (
             <Notification notifications={notifications} />
