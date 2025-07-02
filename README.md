@@ -1,4 +1,4 @@
-# <p align="center"> <img src="public/favicon.ico" width="100" alt="Greenline Logo"> Greenline </p>
+# <p align="center"> <img src="public/favicon.ico" width="100" alt="Greenline Logo"></p>Greenline 
 
 > An open forum platform made for developers and programmers.
 
